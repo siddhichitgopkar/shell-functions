@@ -107,68 +107,81 @@ int main(int argc, char* argv[]) {
         //delim the string of args the user has inputted
         for (int i = 0; i <= numspaces; i++) {
             (string[count]) = token;
+            if (string[0] == NULL) {
+                break;
+            } //if
             count++;
             token = strtok(NULL, delim);
-        } //while
-        (string[count]) = NULL;
-
-        //variables to check for redirection
-        int in = 0;
-        int out = 0;
-        int doublein = 0;
-        int doubleout = 0;
-
-        int inindex = 0;
-        int outindex = 0;
-        int doubleinindex = 0;
-        int doubleoutindex = 0;
-
-
-        //checks to see if there are any and where the redirections are
-        for (int i = 0; i < count; i++) {
-            if (strcmp(string[i],"<") == 0) {
-                in = 1;
-                inindex = i + 1;
-            } //if
-            if (strcmp(string[i],">") == 0) {
-                out = 1;
-                outindex = i + 1;
-            } //if
-            if (strcmp(string[i],"<<") == 0) {
-                doublein = 1;
-                doubleinindex = i + 1;
-            } //if
-            if (strcmp(string[i],">>") == 0) {
-                doubleout = 1;
-                doubleoutindex = i + 1;
-            } //if
         } //for
+        if (string[0] == NULL);
+        else {
+            (string[count]) = NULL;
 
-        //checks to see if there is a redirection in the arguments the user inputted
-        int redirectflag = 0;
-        if (doubleout == 1 || doublein == 1 || in == 1 || out == 1) {
-            redirectflag = 1;
-        } //if
 
-        if (count == 0);
-        else if (strcmp(string[0], "exit") == 0) {
-            free(buf);
-            exit(0);
-        } else if (strcmp(string[0], "cd") == 0) {
-            ChangeDir(string, count);
-        } else if (redirectflag == 1) {
-            if (in == 1) {
-                int input = open(string[inindex], O_RDONLY);
-                dup2(input, STDIN_FILENO);
+            //variables to check for redirection
+            int in = 0;
+            int out = 0;
+            int doublein = 0;
+            int doubleout = 0;
+
+            int inindex = 0;
+            int outindex = 0;
+            int doubleinindex = 0;
+            int doubleoutindex = 0;
+
+
+            //checks to see if there are any and where the redirections are
+            for (int i = 0; i < count; i++) {
+                if (strcmp(string[i],"<") == 0) {
+                    in = 1;
+                    inindex = i + 1;
+                } //if
+                if (strcmp(string[i],">") == 0) {
+                    out = 1;
+                    outindex = i + 1;
+                } //if
+                if (strcmp(string[i],"<<") == 0) {
+                    doublein = 1;
+                    doubleinindex = i + 1;
+                } //if
+                if (strcmp(string[i],">>") == 0) {
+                    doubleout = 1;
+                    doubleoutindex = i + 1;
+                } //if
+            } //for
+
+            //checks to see if there is a redirection in the arguments the user inputted
+            int redirectflag = 0;
+            if (doubleout == 1 || doublein == 1 || in == 1 || out == 1) {
+                redirectflag = 1;
             } //if
-        } else {
-            LaunchProcess(string);
+
+            if (count == 0);
+            else if (strcmp(string[0], "exit") == 0) {
+                free(buf);
+                exit(0);
+            } else if (strcmp(string[0], "cd") == 0) {
+                ChangeDir(string, count);
+            } else if (redirectflag == 1) {
+                if (in == 1) {
+                    int input = open(string[inindex], O_RDONLY);
+                    dup2(input, STDIN_FILENO);
+                } //if
+                /*
+                if (out == 1) {
+                    int output = creat(string[outindex], 0644);
+                    dup2(output, STDOUT_FILENO);
+                } //if
+                */
+            } else {
+                LaunchProcess(string);
+            } //else
+            for (int i = 0; i < count; i++) {
+                if (string[i] != NULL) {
+                    string[i] = NULL;
+                } // if
+            } //for
         } //else
-        for (int i = 0; i < count; i++) {
-            if (string[i] != NULL) {
-                string[i] = NULL;
-            } // if
-        } //for
         free(buf);
     } //while
     return EXIT_SUCCESS;
