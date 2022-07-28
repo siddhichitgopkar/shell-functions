@@ -48,27 +48,28 @@ int ChangeDir(char* string[], int count) {
 } //ChangeDir
 
 int main(int argc, char* argv[]) {
-    const char* homedir = getenv("HOME");
-    chdir(homedir);
+    const char* homedir = getenv("HOME"); //homedirectory set
+    chdir(homedir); //changes to the home directory when the program is executed
     int n;
     int c = 0;
-    int flag = 0;
-    char path[BUFFSIZE];
+    int flag = 0; //flag that tells how long to keep asking the user for args
+    char path[BUFFSIZE]; //declares path
 
+    //calculates how long the home directory is
     while (homedir[c] != '\0') {
         c = c + 1;
     } //while
 
     while (flag != 1) {
-        char* string[120];
+        char* string[120]; //array that holds the user inputted args
         int count = 0;
-        getcwd(path, BUFFSIZE);
+        getcwd(path, BUFFSIZE); //sets path to the cwd
         printf("1730sh:");
         int numspaces = 0;
         char* buf = malloc(BUFFSIZE);
         setbuf(stdout, NULL);
 
-        //change so it works if it includes the home directory
+        //prints out the appropriate prompt based on the pwd and user input
         if (strcmp(path, (getenv("HOME"))) == 0 ) {
             printf("~");
         } else {
@@ -87,6 +88,7 @@ int main(int argc, char* argv[]) {
 
         printf("$ ");
 
+        //counts to see how many spaces there are
         if ((n = read(STDIN_FILENO, buf, BUFFSIZE)) > 0) {
             //counts how many spaces there are
             for (int i = 0; i < n; i++) {
@@ -96,8 +98,10 @@ int main(int argc, char* argv[]) {
             } //for
         } //if
 
+        //the deliminator that is being used to separate the workds
         const char delim[3] = " \n";
 
+        //token to help with deliminating the strings
         char * token = strtok(buf, delim);
 
         //delim the string of args the user has inputted
@@ -108,6 +112,7 @@ int main(int argc, char* argv[]) {
         } //while
         (string[count]) = NULL;
 
+        //variables to check for redirection
         int in = 0;
         int out = 0;
         int doublein = 0;
@@ -118,6 +123,8 @@ int main(int argc, char* argv[]) {
         int doubleinindex = 0;
         int doubleoutindex = 0;
 
+
+        //checks to see if there are any and where the redirections are
         for (int i = 0; i < count; i++) {
             if (strcmp(string[i],"<") == 0) {
                 in = 1;
@@ -137,21 +144,22 @@ int main(int argc, char* argv[]) {
             } //if
         } //for
 
+        //checks to see if there is a redirection in the arguments the user inputted
         int redirectflag = 0;
         if (doubleout == 1 || doublein == 1 || in == 1 || out == 1) {
             redirectflag = 1;
         } //if
 
         if (count == 0);
-        else if (strcmp(string[0], "exit") == 0 ) {
+        else if (strcmp(string[0], "exit") == 0) {
             free(buf);
             exit(0);
         } else if (strcmp(string[0], "cd") == 0) {
             ChangeDir(string, count);
         } else if (redirectflag == 1) {
             if (in == 1) {
-                int fdi = open(string[inindex], O_RDONLY);
-                dup2(fdi, STDIN_FILENO);
+                int input = open(string[inindex], O_RDONLY);
+                dup2(input, STDIN_FILENO);
             } //if
         } else {
             LaunchProcess(string);
