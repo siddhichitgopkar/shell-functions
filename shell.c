@@ -96,17 +96,14 @@ int main(int argc, char* argv[]) {
             } //for
         } //if
 
-
-
         const char delim[3] = " \n";
 
         char * token = strtok(buf, delim);
 
         //delim the string of args the user has inputted
-        while(token != NULL ) {
+        for (int i = 0; i <= numspaces; i++) {
             (string[count]) = token;
             count++;
-            printf("%d\n", count);
             token = strtok(NULL, delim);
         } //while
         (string[count]) = NULL;
@@ -161,7 +158,6 @@ int main(int argc, char* argv[]) {
         } //else
         for (int i = 0; i < count; i++) {
             if (string[i] != NULL) {
-                printf("%s\n", string[i]);
                 string[i] = NULL;
             } // if
         } //for
