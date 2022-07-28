@@ -10,11 +10,9 @@
 int LaunchProcess(char* string[]) {
     int ex;
     pid_t pid;
-
     if ((pid = fork()) < 0) { // error
         perror("fork");
     } else if (pid == 0) { // in child process
-
         ex = execvp(string[0], &string[0]);
         if (ex == -1) {
             perror(string[0]);
@@ -98,6 +96,8 @@ int main(int argc, char* argv[]) {
             } //for
         } //if
 
+
+
         const char delim[3] = " \n";
 
         char * token = strtok(buf, delim);
@@ -106,6 +106,7 @@ int main(int argc, char* argv[]) {
         while(token != NULL ) {
             (string[count]) = token;
             count++;
+            printf("%d\n", count);
             token = strtok(NULL, delim);
         } //while
         (string[count]) = NULL;
@@ -123,19 +124,19 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < count; i++) {
             if (strcmp(string[i],"<") == 0) {
                 in = 1;
-                inindex = i;
+                inindex = i + 1;
             } //if
             if (strcmp(string[i],">") == 0) {
                 out = 1;
-                outindex = i;
+                outindex = i + 1;
             } //if
             if (strcmp(string[i],"<<") == 0) {
                 doublein = 1;
-                doubleinindex = i;
+                doubleinindex = i + 1;
             } //if
             if (strcmp(string[i],">>") == 0) {
                 doubleout = 1;
-                doubleoutindex = i;
+                doubleoutindex = i + 1;
             } //if
         } //for
 
@@ -151,24 +152,19 @@ int main(int argc, char* argv[]) {
         } else if (strcmp(string[0], "cd") == 0) {
             ChangeDir(string, count);
         } else if (redirectflag == 1) {
-            /*
             if (in == 1) {
-                //printf("%d\n", inindex);
-                //printf("input");
                 int fdi = open(string[inindex], O_RDONLY);
                 dup2(fdi, STDIN_FILENO);
             } //if
-            */
-/*
-            if (out == 1) {
-                printf("output");
-                int fdo = open("output.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-                dup2(fdo, STDOUT_FILENO);
-            } //if
-            */
         } else {
             LaunchProcess(string);
         } //else
+        for (int i = 0; i < count; i++) {
+            if (string[i] != NULL) {
+                printf("%s\n", string[i]);
+                string[i] = NULL;
+            } // if
+        } //for
         free(buf);
     } //while
     return EXIT_SUCCESS;
