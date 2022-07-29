@@ -24,6 +24,28 @@ int LaunchProcess(char* string[]) {
 } //LaunchProcess
 
 
+int DupLaunchOut(char* string[], char* filename) {
+    int ex;
+    pid_t pid;
+    char * command = string[0];
+    if ((pid = fork()) < 0) { // error
+        perror("fork");
+    } else if (pid == 0) { // in child process
+        int fd = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        dup2(fd, 1);   // makes the stdout go to file
+        close(fd);
+        execvp(string[0], &string[0]);
+        if (execvp(string[0], &string[0]) == -1) {
+            perror(string[0]);
+        } //if
+        printf("done\n");
+    } else {
+        wait(NULL);
+    } //if
+    return 1;
+} //LaunchProcess
+
+
 int ChangeDir(char* string[], int count) {
     if (count == 1) {
         chdir("..");
@@ -163,16 +185,26 @@ int main(int argc, char* argv[]) {
             } else if (strcmp(string[0], "cd") == 0) {
                 ChangeDir(string, count);
             } else if (redirectflag == 1) {
-                if (in == 1) {
-                    int input = open(string[inindex], O_RDONLY);
-                    dup2(input, STDIN_FILENO);
-                } //if
-                /*
                 if (out == 1) {
                     int output = creat(string[outindex], 0644);
-                    dup2(output, STDOUT_FILENO);
+                    char *outstring[outindex - 1];
+                    for(int i = 0; i < outindex - 1; i++) {
+                        outstring[i] = string[i];
+                    } //for
+                    outstring[outindex - 1] = NULL;
+                    char * filename = string[outindex];
+                    DupLaunchOut(outstring, filename);
                 } //if
-                */
+                if (in == 1) {
+                    int output = creat(string[inindex], 0644);
+                    char *instring[inindex - 1];
+                    for(int i = 0; i < inindex - 1; i++) {
+                        instring[i] = string[i];
+                    } //for
+                    instring[inindex - 1] = NULL;
+                    char * filename = string[inindex];
+                    DupLaunchOut(instring, filename);
+                } //if
             } else {
                 LaunchProcess(string);
             } //else
