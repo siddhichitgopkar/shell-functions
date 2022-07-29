@@ -24,7 +24,7 @@ int LaunchProcess(char* string[]) {
 } //LaunchProcess
 
 
-int DupLaunchOut(char* string[], char* filename) {
+int DupLaunchOut(char* string[], char* filename, int output) {
     pid_t pid;
     int fd;
     if ((pid = fork()) < 0) { // error
@@ -44,7 +44,7 @@ int DupLaunchOut(char* string[], char* filename) {
 } //DupLaunchOut
 
 
-int DupLaunchIn(char* string[], char * file) {
+int DupLaunchIn(char* string[], char * file, int input) {
     pid_t pid;
     if ((pid = fork()) < 0) { // error
         perror("fork");
@@ -209,7 +209,7 @@ int main(int argc, char* argv[]) {
                     char * filename;
                     outstring[outindex - 1] = NULL;
                     filename = string[outindex];
-                    DupLaunchOut(outstring, filename);
+                    DupLaunchOut(outstring, filename, output);
                 } //if
                 if (in == 1) {
                     int input = open(string[inindex], 0644);
@@ -220,7 +220,7 @@ int main(int argc, char* argv[]) {
                     instring[inindex - 1] = string[inindex];
                     instring[inindex] = NULL;
                     char * file = string[inindex];
-                    DupLaunchIn(instring, file);
+                    DupLaunchIn(instring, file, input);
                 } //if
             } else {
                 LaunchProcess(string);
